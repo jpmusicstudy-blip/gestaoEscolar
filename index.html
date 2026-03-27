@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EduGestão — Sistema Escolar</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <span class="logo-icon">⬡</span>
+    <span class="logo-text">EduGestão</span>
+  </div>
+
+  <nav class="sidebar-nav">
+    <button class="nav-item active" data-view="dashboard">
+      <span class="nav-icon">◈</span> Dashboard
+    </button>
+    <button class="nav-item" data-view="alunos">
+      <span class="nav-icon">◉</span> Alunos
+    </button>
+    <button class="nav-item" data-view="presenca">
+      <span class="nav-icon">◎</span> Presença
+    </button>
+    <button class="nav-item" data-view="notas">
+      <span class="nav-icon">◇</span> Notas
+    </button>
+    <button class="nav-item" data-view="atividades">
+      <span class="nav-icon">◆</span> Atividades
+    </button>
+    <button class="nav-item" data-view="aulas">
+      <span class="nav-icon">◷</span> Aulas
+    </button>
+    <button class="nav-item" data-view="desempenho">
+      <span class="nav-icon">◈</span> Desempenho
+    </button>
+  </nav>
+
+  <div class="sidebar-turmas">
+    <p class="turmas-label">TURMAS</p>
+    <div class="turmas-grid">
+      <button class="turma-btn active" data-turma="CK1">CK 1</button>
+      <button class="turma-btn" data-turma="CK2">CK 2</button>
+      <button class="turma-btn" data-turma="CK3">CK 3</button>
+      <button class="turma-btn" data-turma="CK4">CK 4</button>
+      <button class="turma-btn" data-turma="CT1">CT 1</button>
+      <button class="turma-btn" data-turma="CT2">CT 2</button>
+      <button class="turma-btn" data-turma="CT3">CT 3</button>
+      <button class="turma-btn" data-turma="CT4">CT 4</button>
+    </div>
+  </div>
+
+  <div class="sidebar-supabase">
+    <div class="supabase-status" id="supabase-status">
+      <span class="status-dot disconnected"></span>
+      <span>Supabase desconectado</span>
+    </div>
+    <button class="btn-config" id="btn-config">⚙ Configurar</button>
+  </div>
+</aside>
+
+<!-- MAIN CONTENT -->
+<main class="main">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="sidebar-toggle" id="sidebar-toggle">☰</button>
+      <div class="breadcrumb">
+        <span id="breadcrumb-view">Dashboard</span>
+        <span class="sep">›</span>
+        <span id="breadcrumb-turma">CK 1</span>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="turma-badge" id="turma-badge">CK 1</div>
+      <div class="date-display" id="date-display"></div>
+    </div>
+  </header>
+
+  <!-- VIEWS -->
+  <div class="content-area">
+
+    <!-- DASHBOARD -->
+    <section class="view active" id="view-dashboard">
+      <div class="view-header">
+        <h1>Dashboard</h1>
+        <p>Visão geral da turma <span id="dash-turma-name">CK 1</span></p>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card accent-green">
+          <div class="stat-number" id="stat-alunos">0</div>
+          <div class="stat-label">Alunos</div>
+        </div>
+        <div class="stat-card accent-blue">
+          <div class="stat-number" id="stat-presenca">—</div>
+          <div class="stat-label">Freq. Média</div>
+        </div>
+        <div class="stat-card accent-yellow">
+          <div class="stat-number" id="stat-media">—</div>
+          <div class="stat-label">Média Notas</div>
+        </div>
+        <div class="stat-card accent-red">
+          <div class="stat-number" id="stat-atividades">0</div>
+          <div class="stat-label">Atividades</div>
+        </div>
+        <div class="stat-card accent-purple">
+          <div class="stat-number" id="stat-aulas">0</div>
+          <div class="stat-label">Aulas</div>
+        </div>
+        <div class="stat-card accent-teal">
+          <div class="stat-number" id="stat-carga">0h</div>
+          <div class="stat-label">Carga Horária</div>
+        </div>
+      </div>
+      <div class="dashboard-grid">
+        <div class="card">
+          <h3>Ranking da Turma</h3>
+          <div class="ranking-list" id="ranking-list">
+            <p class="empty-state">Nenhum dado ainda.</p>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Alertas</h3>
+          <div class="alert-list" id="alert-list">
+            <p class="empty-state">Sem alertas no momento.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ALUNOS -->
+    <section class="view" id="view-alunos">
+      <div class="view-header">
+        <h1>Alunos</h1>
+        <button class="btn-primary" id="btn-add-aluno">+ Adicionar Aluno</button>
+      </div>
+      <div class="search-bar">
+        <input type="text" id="search-aluno" placeholder="Buscar aluno..." />
+      </div>
+      <div class="table-wrapper">
+        <table class="data-table" id="table-alunos">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Nome</th>
+              <th>Matrícula</th>
+              <th>Turma</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-alunos">
+            <tr><td colspan="5" class="empty-state">Nenhum aluno cadastrado.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- PRESENÇA -->
+    <section class="view" id="view-presenca">
+      <div class="view-header">
+        <h1>Presença</h1>
+        <div class="header-actions">
+          <input type="date" id="date-presenca" class="input-date" />
+          <button class="btn-primary" id="btn-salvar-presenca">Salvar Presença</button>
+        </div>
+      </div>
+      <div class="table-wrapper">
+        <table class="data-table" id="table-presenca">
+          <thead>
+            <tr>
+              <th>Aluno</th>
+              <th>Presença</th>
+              <th>Justificativa</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-presenca">
+            <tr><td colspan="3" class="empty-state">Selecione uma turma com alunos.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card mt">
+        <h3>Histórico de Presenças</h3>
+        <div id="historico-presenca" class="historico-list">
+          <p class="empty-state">Nenhum registro.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- NOTAS -->
+    <section class="view" id="view-notas">
+      <div class="view-header">
+        <h1>Notas</h1>
+        <button class="btn-primary" id="btn-add-nota">+ Lançar Nota</button>
+      </div>
+      <div class="table-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Aluno</th>
+              <th>Bimestre</th>
+              <th>Disciplina</th>
+              <th>Nota</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-notas">
+            <tr><td colspan="5" class="empty-state">Nenhuma nota lançada.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ATIVIDADES -->
+    <section class="view" id="view-atividades">
+      <div class="view-header">
+        <h1>Atividades</h1>
+        <button class="btn-primary" id="btn-add-atividade">+ Nova Atividade</button>
+      </div>
+      <div class="atividades-grid" id="atividades-grid">
+        <p class="empty-state">Nenhuma atividade cadastrada.</p>
+      </div>
+    </section>
+
+    <!-- AULAS -->
+    <section class="view" id="view-aulas">
+      <div class="view-header">
+        <h1>Aulas</h1>
+        <button class="btn-primary" id="btn-add-aula">+ Registrar Aula</button>
+      </div>
+
+      <!-- Resumo de carga horária -->
+      <div class="aulas-resumo-grid">
+        <div class="aulas-resumo-card">
+          <div class="resumo-icon">📚</div>
+          <div class="resumo-info">
+            <div class="resumo-num" id="res-total-aulas">0</div>
+            <div class="resumo-label">Total de Aulas</div>
+          </div>
+        </div>
+        <div class="aulas-resumo-card">
+          <div class="resumo-icon">⏱</div>
+          <div class="resumo-info">
+            <div class="resumo-num" id="res-aulas-regular">0</div>
+            <div class="resumo-label">Aulas Regulares (2h)</div>
+          </div>
+        </div>
+        <div class="aulas-resumo-card">
+          <div class="resumo-icon">📋</div>
+          <div class="resumo-info">
+            <div class="resumo-num" id="res-aulas-ae">0</div>
+            <div class="resumo-label">Aulas AE (1h)</div>
+          </div>
+        </div>
+        <div class="aulas-resumo-card highlight">
+          <div class="resumo-icon">🕐</div>
+          <div class="resumo-info">
+            <div class="resumo-num" id="res-carga-total">0h</div>
+            <div class="resumo-label">Carga Horária Total</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filtro por tipo -->
+      <div class="aulas-filtros">
+        <button class="filtro-btn active" data-filtro="todos">Todas</button>
+        <button class="filtro-btn" data-filtro="regular">Regular (2h)</button>
+        <button class="filtro-btn" data-filtro="AE">AE (1h)</button>
+      </div>
+
+      <div class="table-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Data</th>
+              <th>Tipo</th>
+              <th>Disciplina</th>
+              <th>Conteúdo</th>
+              <th>Início</th>
+              <th>Término</th>
+              <th>Duração</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-aulas">
+            <tr><td colspan="9" class="empty-state">Nenhuma aula registrada.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- DESEMPENHO -->
+    <section class="view" id="view-desempenho">
+      <div class="view-header">
+        <h1>Desempenho</h1>
+        <p>Análise completa por aluno</p>
+      </div>
+      <div class="search-bar">
+        <select id="select-aluno-desemp" class="input-select">
+          <option value="">Selecione um aluno...</option>
+        </select>
+      </div>
+      <div id="desempenho-content">
+        <p class="empty-state">Selecione um aluno para ver o desempenho.</p>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="modal-overlay"></div>
+
+<!-- Modal: Config Supabase -->
+<div class="modal" id="modal-supabase">
+  <div class="modal-header">
+    <h2>Configurar Supabase</h2>
+    <button class="modal-close" data-modal="modal-supabase">✕</button>
+  </div>
+  <div class="modal-body">
+    <label>URL do Projeto</label>
+    <input type="text" id="sb-url" placeholder="https://xxxx.supabase.co" />
+    <label>Chave Anon (anon key)</label>
+    <input type="text" id="sb-key" placeholder="eyJh..." />
+    <div class="modal-info">
+      <p>⚠ As credenciais são salvas localmente no navegador. Nunca compartilhe sua service_role key.</p>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn-secondary" data-modal="modal-supabase">Cancelar</button>
+    <button class="btn-primary" id="btn-salvar-config">Salvar & Conectar</button>
+  </div>
+</div>
+
+<!-- Modal: Adicionar/Editar Aluno -->
+<div class="modal" id="modal-aluno">
+  <div class="modal-header">
+    <h2 id="modal-aluno-title">Adicionar Aluno</h2>
+    <button class="modal-close" data-modal="modal-aluno">✕</button>
+  </div>
+  <div class="modal-body">
+    <label>Nome Completo</label>
+    <input type="text" id="aluno-nome" placeholder="Nome do aluno" />
+    <label>Matrícula</label>
+    <input type="text" id="aluno-matricula" placeholder="Ex: 2024001" />
+    <label>Turma</label>
+    <select id="aluno-turma" class="input-select">
+      <option value="CK1">CK 1</option>
+      <option value="CK2">CK 2</option>
+      <option value="CK3">CK 3</option>
+      <option value="CK4">CK 4</option>
+      <option value="CT1">CT 1</option>
+      <option value="CT2">CT 2</option>
+      <option value="CT3">CT 3</option>
+      <option value="CT4">CT 4</option>
+    </select>
+    <input type="hidden" id="aluno-id" />
+  </div>
+  <div class="modal-footer">
+    <button class="btn-secondary" data-modal="modal-aluno">Cancelar</button>
+    <button class="btn-primary" id="btn-salvar-aluno">Salvar</button>
+  </div>
+</div>
+
+<!-- Modal: Lançar Nota -->
+<div class="modal" id="modal-nota">
+  <div class="modal-header">
+    <h2 id="modal-nota-title">Lançar Nota</h2>
+    <button class="modal-close" data-modal="modal-nota">✕</button>
+  </div>
+  <div class="modal-body">
+    <label>Aluno</label>
+    <select id="nota-aluno" class="input-select"></select>
+    <label>Disciplina</label>
+    <input type="text" id="nota-disciplina" placeholder="Ex: Matemática" />
+    <label>Bimestre</label>
+    <select id="nota-bimestre" class="input-select">
+      <option value="1">1º Bimestre</option>
+      <option value="2">2º Bimestre</option>
+      <option value="3">3º Bimestre</option>
+      <option value="4">4º Bimestre</option>
+    </select>
+    <label>Nota (0 – 10)</label>
+    <input type="number" id="nota-valor" min="0" max="10" step="0.1" placeholder="0.0" />
+    <input type="hidden" id="nota-id" />
+  </div>
+  <div class="modal-footer">
+    <button class="btn-secondary" data-modal="modal-nota">Cancelar</button>
+    <button class="btn-primary" id="btn-salvar-nota">Salvar</button>
+  </div>
+</div>
+
+<!-- Modal: Nova Atividade -->
+<div class="modal" id="modal-atividade">
+  <div class="modal-header">
+    <h2 id="modal-atividade-title">Nova Atividade</h2>
+    <button class="modal-close" data-modal="modal-atividade">✕</button>
+  </div>
+  <div class="modal-body">
+    <label>Título</label>
+    <input type="text" id="ativ-titulo" placeholder="Ex: Prova de Português" />
+    <label>Descrição</label>
+    <textarea id="ativ-desc" placeholder="Descrição da atividade..." rows="3"></textarea>
+    <label>Disciplina</label>
+    <input type="text" id="ativ-disciplina" placeholder="Ex: Português" />
+    <label>Data de Entrega</label>
+    <input type="date" id="ativ-data" />
+    <label>Peso (1–3)</label>
+    <select id="ativ-peso" class="input-select">
+      <option value="1">1 — Baixo</option>
+      <option value="2">2 — Médio</option>
+      <option value="3">3 — Alto</option>
+    </select>
+    <input type="hidden" id="ativ-id" />
+  </div>
+  <div class="modal-footer">
+    <button class="btn-secondary" data-modal="modal-atividade">Cancelar</button>
+    <button class="btn-primary" id="btn-salvar-atividade">Salvar</button>
+  </div>
+</div>
+
+<!-- Modal: Registrar/Editar Aula -->
+<div class="modal" id="modal-aula">
+  <div class="modal-header">
+    <h2 id="modal-aula-title">Registrar Aula</h2>
+    <button class="modal-close" data-modal="modal-aula">✕</button>
+  </div>
+  <div class="modal-body">
+    <label>Tipo de Aula</label>
+    <select id="aula-tipo" class="input-select">
+      <option value="regular">Regular — 2 horas</option>
+      <option value="AE">AE — 1 hora</option>
+    </select>
+    <label>Disciplina</label>
+    <input type="text" id="aula-disciplina" placeholder="Ex: Matemática" />
+    <label>Conteúdo / Tema</label>
+    <input type="text" id="aula-conteudo" placeholder="Ex: Equações do 2º grau" />
+    <label>Data</label>
+    <input type="date" id="aula-data" />
+    <label>Horário de Início</label>
+    <input type="time" id="aula-inicio" />
+    <label>Horário de Término <span class="label-auto">(calculado automaticamente)</span></label>
+    <input type="time" id="aula-fim" readonly class="input-readonly" />
+    <div class="aula-duracao-info" id="aula-duracao-info">
+      <span class="dur-icon">⏱</span>
+      <span id="aula-duracao-txt">Selecione o tipo e horário de início</span>
+    </div>
+    <input type="hidden" id="aula-id" />
+  </div>
+  <div class="modal-footer">
+    <button class="btn-secondary" data-modal="modal-aula">Cancelar</button>
+    <button class="btn-primary" id="btn-salvar-aula">Salvar</button>
+  </div>
+</div>
+
+<!-- Modal: Confirmar Exclusão -->
+<div class="modal modal-sm" id="modal-confirm">
+  <div class="modal-header">
+    <h2>Confirmar Exclusão</h2>
+    <button class="modal-close" data-modal="modal-confirm">✕</button>
+  </div>
+  <div class="modal-body">
+    <p id="confirm-msg">Tem certeza que deseja excluir este item?</p>
+  </div>
+  <div class="modal-footer">
+    <button class="btn-secondary" data-modal="modal-confirm">Cancelar</button>
+    <button class="btn-danger" id="btn-confirm-delete">Excluir</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast-container" id="toast-container"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
